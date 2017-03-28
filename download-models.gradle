@@ -28,6 +28,7 @@ buildscript {
 }
 
 import de.undercouch.gradle.tasks.download.Download
+
 task downloadFile(type: Download){
     for (f in models) {
         src "${MODEL_URL}/" + f
@@ -51,6 +52,12 @@ task extractModels(type: Copy) {
 afterEvaluate {
     // if models are not available, download & unzip them
     def needDownload = false
+
+    // create dir if not exists
+    if (!(new File(project.ext.TMP_DIR)).exists()) {
+        new File(project.ext.TMP_DIR).mkdir();
+    }
+
     for (f in models) {
         if (!(new File(project.ext.TMP_DIR + '/' + f)).exists()) {
             needDownload = true

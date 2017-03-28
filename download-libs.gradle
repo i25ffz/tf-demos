@@ -9,14 +9,11 @@
  */
 // hard coded model files
 // LINT.IfChange
-def models = ['inception5h.zip'
-              //'mobile_multibox_v1a.zip',
-              //'stylize_v1.zip'
-              ]
-// LINT.ThenChange(//tensorflow/examples/android/BUILD)
+def libs = ['native/libtensorflow_inference.so/armeabi-v7a/libtensorflow_inference.so',
+    'native/libtensorflow_demo.so/armeabi-v7a/libtensorflow_demo.so']
 
 // Root URL for model archives
-def MODEL_URL = 'https://storage.googleapis.com/download.tensorflow.org/models'
+def LIBS_URL = 'https://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/'
 
 buildscript {
     repositories {
@@ -28,38 +25,37 @@ buildscript {
 }
 
 import de.undercouch.gradle.tasks.download.Download
-task downloadFile(type: Download){
-    for (f in models) {
-        src "${MODEL_URL}/" + f
-    }
-    dest new File(project.ext.TMP_DIR)
+
+task downloadJar(type: Download){
+    src "${LIBS_URL}/libandroid_tensorflow_inference_java.jar"
+    dest new File(project.ext.LIBS_DIR)
     overwrite true
 }
 
-task extractModels(type: Copy) {
-    for (f in models) {
-        from zipTree(project.ext.TMP_DIR + '/' + f)
+task downloadLibs(type: Download){
+    for (f in libs) {
+        src "${LIBS_URL}/" + f
     }
-
-    into file(project.ext.ASSET_DIR)
-    fileMode  0644
-    exclude '**/LICENSE'
-
-    dependsOn downloadFile
+    dest new File(project.ext.LIBS_DIR + "/armeabi-v7a")
+    overwrite true
 }
 
 afterEvaluate {
     // if models are not available, download & unzip them
     def needDownload = false
-    for (f in models) {
-        if (!(new File(project.ext.TMP_DIR + '/' + f)).exists()) {
-            needDownload = true
-        }
+
+    // create dir if not exists
+    if (!(new File(project.ext.LIBS_DIR + "/armeabi-v7a")).exists()) {
+        new File(project.ext.TMP_DIR).mkdirs();
+    }
+
+    if (!(new File(project.ext.LIBS_DIR + '/libandroid_tensorflow_inference_java.jar')).exists()) {
+        needDownload = true
     }
 
     if (needDownload) {
-        assembleDebug.dependsOn extractModels
-        assembleRelease.dependsOn extractModels
+        assembleDebug.dependsOn downloadJar, downloadLibs
+        assembleRelease.dependsOn downloadJar, downloadLibs
     }
 }
 
