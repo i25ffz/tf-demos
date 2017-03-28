@@ -13,7 +13,7 @@ def libs = ['native/libtensorflow_inference.so/armeabi-v7a/libtensorflow_inferen
     'native/libtensorflow_demo.so/armeabi-v7a/libtensorflow_demo.so']
 
 // Root URL for model archives
-def LIBS_URL = 'https://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/'
+def LIBS_URL = 'https://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out'
 
 buildscript {
     repositories {
@@ -46,7 +46,7 @@ afterEvaluate {
 
     // create dir if not exists
     if (!(new File(project.ext.LIBS_DIR + "/armeabi-v7a")).exists()) {
-        new File(project.ext.TMP_DIR).mkdirs();
+        new File(project.ext.LIBS_DIR + "/armeabi-v7a").mkdirs();
     }
 
     if (!(new File(project.ext.LIBS_DIR + '/libandroid_tensorflow_inference_java.jar')).exists()) {
