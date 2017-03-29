@@ -58,10 +58,8 @@ afterEvaluate {
         new File(project.ext.TMP_DIR).mkdir();
     }
 
-    for (f in models) {
-        if (!(new File(project.ext.TMP_DIR + '/' + f)).exists()) {
-            needDownload = true
-        }
+    if (!(new File(project.ext.ASSET_DIR + '/tensorflow_inception_graph.pb')).exists()) {
+        needDownload = true
     }
 
     if (needDownload) {
